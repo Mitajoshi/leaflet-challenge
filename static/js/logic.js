@@ -31,11 +31,7 @@ function createFeatures(earthquakeData) {
       });
     },
     onEachFeature: function (feature, layer) {
-      const timestamp = feature.properties.time;
-      const datetime = TimestampToDatetime(timestamp);
-            
-      layer.bindPopup(`<h3>Magnitude: ${feature.properties.mag}<br>Depth: ${feature.geometry.coordinates[2]}</br></h4><hr><p>Time: ${datetime}</p><hr><p>Location: ${feature.properties.place}</p>`);
-      
+    layer.bindPopup(`<h3>Magnitude: ${feature.properties.mag}<br>Depth: ${feature.geometry.coordinates[2]}</br></h4><hr><p>Time: ${Date(feature.properties.time)}</p><hr><p>Location: ${feature.properties.place}</p>`);
     }
   })
   
@@ -43,27 +39,12 @@ function createFeatures(earthquakeData) {
   createMap(earthquakes);
 };
   
-// Function to convert timestamp to Date Time format
-function TimestampToDatetime(timestamp) {
-  const date = new Date(timestamp);
-  const options = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    timeZoneName: 'short'
-  };
-  return date.toLocaleString('en-US', options);
-}
-
 // Function to set the color of the circular maker based on the depth of the quake
 function getColor(depth){
   // console.log("depth", depth);
-  if (depth > 90){return "red"}
-  else if (depth > 70 && depth < 90){return "orange"}
-  else if (depth > 50 && depth < 70){return "blue"}
+  if (depth > 90){return "black"}
+  else if (depth > 70 && depth < 90){return "red"}
+  else if (depth > 50 && depth < 70){return "orange"}
   else if (depth > 30 && depth < 50){return "cyan"}
   else if (depth > 10 && depth < 30){return "yellow"}
   else if (depth > -10 && depth < 10){return "lightgreen"}
@@ -106,143 +87,35 @@ L.control.layers(baseMaps, overlayMaps, {
 
 // Create a legend control
 const legend = L.control({ position: 'bottomright' });
+legend.onAdd = function (myMap) {
 
-// Function to create a color legend for the map
-function createLegend() {
-  // Define legend content based on earthquake magnitudes
-  const legendContent = `
-    <div class="legend">
-      <h4>Earthquake Depth Color Indicator</h4>
-      <ul>
-        <li><span style="background-color: #fee08b"></span>RED - Extremely Deep</li>
-        <li><span style="background-color: #fdb863"></span>ORANGE - Very Deep</li>
-        <li><span style="background-color: #e08214"></span>BLUE - Deep</li>
-        <li><span style="background-color: #b35806"></span>CYAN - Shallow</li>
-        <li><span style="background-color: #8c510a"></span>YELLOW - Very Shallow</li>
-        <li><span style="background-color: #543005"></span>LIGHTGREEN - Surface</li>
-        <li><span style="background-color: #543005"></span>WHITE - Others</li>
-      </ul>
-    </div>
-  `;
-
-  return legendContent;
-}
+    const div = L.DomUtil.create('div', 'info legend');
+    labels = ['<strong>Categories in Depth of Quake</strong>'],
+    categories = ['Extremely Deep','Very Deep','Deep','Shallow', 'Very Shallow', 'Surface'];
+    
+    for (var i = 0; i < categories.length; i++) {
+    
+            div.innerHTML += 
+            labels.push(
+                '<i class="circle" style="background:' + legendColor(categories[i]) + '"></i> ' +
+            (categories[i] ? categories[i] : '+'));
+    
+        }
+        div.innerHTML = labels.join('<br>');
+    return div;
+    };
   
-// Set the onAdd method
-legend.onAdd = function () {
-  const div = L.DomUtil.create('div', 'info legend');
-  div.innerHTML = createLegend();
-  return div;
-};
-
-// Add the legend control to the map
-legend.addTo(myMap);
+    function legendColor(d) {
+        return d === 'Extremely Deep'  ? "black" :
+               d === 'Very Deep'  ? "red" :
+               d === 'Deep' ? "orange" :
+               d === 'Shallow' ? "cyan" :
+               d === 'Very Shallow' ? "yellow" :
+               d === 'Surface' ? "lightgreen" :
+                                 "white"; 
+                            
+        };
+        legend.addTo(myMap);
 
 
 }
-
-
-
-// legend.onAdd = function (myMap) {
-
-//   const div = L.DomUtil.create('div', 'info legend');
-  // labels = ['<strong>Categories in Depth of Quake</strong>'],
-  // categories = ['Extremely Deep','Very Deep','Deep','Shallow', 'Very Shallow', 'Surface'];
-  
-  // for (var i = 0; i < categories.length; i++) {
-  
-  //         div.innerHTML += 
-  //         labels.push(
-  //             '<i class="circle" style="background:' + legendColor(categories[i]) + '"></i> ' +
-  //         (categories[i] ? categories[i] : '+'));
-  
-  //     }
-  //     div.innerHTML = labels.join('<br>');
-  // return div;
-  // };
-
-
-
-
-// ++++++++++++++++++++++++++++++++++++++++ Legend from Chat +++++++++++++++++++++++++
-
-// 'Extremely Deep'  ? "red" :
-//          d === 'Very Deep'  ? "orange" :
-//          d === 'Deep' ? "blue" :
-//          d === 'Shallow' ? "cyan" :
-//          d === 'Very Shallow' ? "yellow" :
-//          d === 'Surface' ? "lightgreen" :
-//                            "white"; 
-// Function to generate legend HTML
-
-
-
-
-
-
-
-
-
-  
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%% LEGEND CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-//     function style(feature) {
-//     return {
-//         weight: 1.5,
-//         opacity: 1,
-//         fillOpacity: 1,
-//         radius: 6,
-//         fillColor: getColor(feature.properties.TypeOfIssue),
-//         color: "grey"
-
-//     };
-// }
-
-  // if (depth > 90){return "red"}
-  // else if (depth > 70 && depth < 90){return "orange"}
-  // else if (depth > 50 && depth < 70){return "blue"}
-  // else if (depth > 30 && depth < 50){return "cyan"}
-  // else if (depth > 10 && depth < 30){return "yellow"}
-  // else if (depth > -10 && depth < 10){return "lightgreen"}
-
-// function legendColor(d) {
-//   return d === 'Extremely Deep'  ? "red" :
-//          d === 'Very Deep'  ? "orange" :
-//          d === 'Deep' ? "blue" :
-//          d === 'Shallow' ? "cyan" :
-//          d === 'Very Shallow' ? "yellow" :
-//          d === 'Surface' ? "lightgreen" :
-//                            "white"; 
-                      
-//   };
-
-// var legend = L.control({position: 'left'});
-// legend.onAdd = function (myMap) {
-
-// var div = L.DomUtil.create('div', 'info legend');
-// labels = ['<strong>Categories in Depth of Quake</strong>'],
-// categories = ['Extremely Deep','Very Deep','Deep','Shallow', 'Very Shallow', 'Surface'];
-
-// for (var i = 0; i < categories.length; i++) {
-
-//         div.innerHTML += 
-//         labels.push(
-//             '<i class="circle" style="background:' + legendColor(categories[i]) + '"></i> ' +
-//         (categories[i] ? categories[i] : '+'));
-
-//     }
-//     div.innerHTML = labels.join('<br>');
-// return div;
-// };
-// legend.addTo(myMap);
-  
-// Using Leaflet, create a map that plots all the earthquakes from your dataset based on their longitude and latitude.
-
-// Your data markers should reflect the magnitude of the earthquake by their size and the depth of the earthquake by color. Earthquakes with higher magnitudes should appear larger, and earthquakes with greater depth should appear darker in color.
-
-// Hint: The depth of the earth can be found as the third coordinate for each earthquake.
-
-// Include popups that provide additional information about the earthquake when its associated marker is clicked.
-
-// Create a legend that will provide context for your map data.

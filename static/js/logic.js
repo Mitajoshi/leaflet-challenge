@@ -34,13 +34,14 @@ function createFeatures(earthquakeData) {
 // Function to set the color of the circular maker based on the depth of the quake
 // Deeper the earthquake, darker should be the color
 // The depth categories have been chosen after studying different maps for reference
-function getColor(depth){
-  if (depth > 90){return "black"}
-  else if (depth > 70 && depth < 90){return "red"}
-  else if (depth > 50 && depth < 70){return "orange"}
-  else if (depth > 30 && depth < 50){return "cyan"}
-  else if (depth > 10 && depth < 30){return "yellow"}
-  else if (depth > -10 && depth < 10){return "lightgreen"}
+function getColor(d){
+  return d > 90 ? '#800026' :
+           d > 70  ? '#BD0026' :
+           d > 50  ? '#E31A1C' :
+           d > 30  ? '#FC4E2A' :
+           d > 10   ? '#FD8D3C' :
+           d > -10   ? '#FEB24C' :
+                       '#FED976';
 };
 
 
@@ -83,30 +84,19 @@ const legend = L.control({ position: 'bottomright' });
 legend.onAdd = function (myMap) {
 
     const div = L.DomUtil.create('div', 'info legend');
-    labels = ['<strong>Categories in Depth of Quake</strong>'],
-    categories = ['Extremely Deep','Very Deep','Deep','Shallow', 'Very Shallow', 'Surface'];
+    labels = ['<strong>Depth Ranges of Quake</strong>'],
+    categories = [-10, 10, 30, 50, 70, 90];
     
     for (var i = 0; i < categories.length; i++) {
   
           div.innerHTML += 
           labels.push(
-              '<i class="circle" style="background:' + legendColor(categories[i]) + '"></i> ' +
-          (categories[i] ? categories[i] : '+'));
-  
+                      '<i class="circle" style="background:' + getColor(categories[i]) + '"></i> ' + categories[i] +
+          (categories[i + 1] ? '&ndash;' + categories[i + 1] + '<br>' : '+'));
       }
       div.innerHTML = labels.join('<br>');
   return div;
   };
 
-  function legendColor(d) {
-      return d === 'Extremely Deep'  ? "black" :
-              d === 'Very Deep'  ? "red" :
-              d === 'Deep' ? "orange" :
-              d === 'Shallow' ? "cyan" :
-              d === 'Very Shallow' ? "yellow" :
-              d === 'Surface' ? "lightgreen" :
-                                "white"; 
-                          
-      };
       legend.addTo(myMap);
 }
